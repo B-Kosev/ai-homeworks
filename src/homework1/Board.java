@@ -46,7 +46,6 @@ public class Board {
 	 */
 	public Map<Board, String> neighbours() {
 		Map<Board, String> boards = new HashMap<>();
-		// Stack<String> moves = new Stack<>();
 
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < rows; j++) {
@@ -56,22 +55,17 @@ public class Board {
 				}
 				// Calculate possible moves
 				if (i > 0) {
-					boards.put(move(i, j, i - 1, j), "up");
-					// moves.push("up");
+					boards.put(move(i, j, i - 1, j), "down");
 				}
 				if (i < rows - 1) {
-					boards.put(move(i, j, i + 1, j), "down");
-					// moves.push("down");
+					boards.put(move(i, j, i + 1, j), "up");
 				}
 				if (j > 0) {
-					boards.put(move(i, j, i, j - 1), "left");
-					// moves.push("left");
+					boards.put(move(i, j, i, j - 1), "right");
 				}
 				if (j < rows - 1) {
-					boards.put(move(i, j, i, j + 1), "right");
-					// moves.push("right");
+					boards.put(move(i, j, i, j + 1), "left");
 				}
-				// System.out.println(moves.pop());
 				return boards;
 			}
 		}
