@@ -19,6 +19,10 @@ public class Board {
 		return rows;
 	}
 
+	public int[][] getTiles() {
+		return tiles;
+	}
+
 	/**
 	 * Calculates the manhattan distance to the goal board
 	 *

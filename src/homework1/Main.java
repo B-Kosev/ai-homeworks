@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Main {
 	/**
@@ -12,7 +14,7 @@ public class Main {
 	 * @param root
 	 *            - the initial board node
 	 */
-	private static void search(Node root) {
+	private static List<String> search(Node root) {
 		// Initial f score
 		int threshold = root.getfScore();
 
@@ -22,20 +24,19 @@ public class Main {
 
 		int minThreshold;
 		do {
-			System.out.println("Threshold: " + threshold);
+			// System.out.println("Threshold: " + threshold);
 			// Returns the minimum threshold, bigger than the current or Integer.MAX_VALUE if no there is no solution
 			minThreshold = recursiveSearch(visited, 0, threshold, steps);
 
 			// If the goal is found
 			if (minThreshold == 0) {
-				System.out.println(steps.size());
-				steps.forEach(System.out::println);
-				return;
+				return steps;
 			}
 
 			threshold = minThreshold;
 		} while (threshold != Integer.MAX_VALUE);
 		System.out.println("No solution found!");
+		return null;
 	}
 
 	/**
@@ -104,6 +105,57 @@ public class Main {
 		return minNewFscore;
 	}
 
+	/**
+	 * Check whether a given matrix is solvable. Counts the numbers of inversion and the row of the blank tile. Inversion is formed when A <
+	 * B but B appears before A in the matrix.
+	 * 
+	 * @param array
+	 *            - the matrix transformed to 1D array
+	 * @param rowSize
+	 *            - the number of rows
+	 * @return true if the puzzle is solvable, false otherwise
+	 */
+	private static boolean isSolvable(int[] array, int rowSize) {
+		int inversions = 0;
+		int currentRow = 0;
+		int rowWithBlank = 0;
+
+		for (int i = 0; i < array.length; i++) {
+			// Advance to next row
+			if (i % rowSize == 0) {
+				currentRow++;
+			}
+			// Save the row of the blank tile
+			if (array[i] == 0) {
+				rowWithBlank = currentRow;
+				continue;
+			}
+			// Count inversions
+			for (int j = i + 1; j < array.length; j++) {
+				if (array[i] > array[j] && array[j] != 0) {
+					inversions++;
+				}
+			}
+		}
+
+		// If the grid is even we count if the blank tile is on odd row
+		if (rowSize % 2 == 0) {
+			// If the blank is on even row, counting from the bottom, we need even number of inversions
+			if (rowWithBlank % 2 == 0) {
+				return inversions % 2 == 0;
+
+			}
+			// If the blank is on odd row, we need odd number of inversions
+			else {
+				return inversions % 2 != 0;
+			}
+		}
+		// If the grid is odd, we need even number of inversions
+		else {
+			return inversions % 2 == 0;
+		}
+	}
+
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 
@@ -135,6 +187,28 @@ public class Main {
 		System.out.println(board);
 
 		System.out.println("Solving...");
-		search(new Node(board, 0));
+
+		// Solving...
+		long startTime = System.currentTimeMillis();
+
+		// Convert the 2D matrix to 1D array
+		int[] array = Stream.of(board.getTiles()).flatMapToInt(IntStream::of).toArray();
+		if (!isSolvable(array, rowSize)) {
+			System.out.println("The puzzle is not solvable.");
+			return;
+		}
+
+		List<String> steps = search(new Node(board, 0));
+		long endTime = System.currentTimeMillis();
+
+		if (steps != null) {
+			System.out.println(steps.size());
+			steps.forEach(System.out::println);
+		} else {
+			System.out.println("No path found.");
+		}
+
+		System.out.println((endTime - startTime) / 1000.0);
 	}
+
 }
