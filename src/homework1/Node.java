@@ -1,10 +1,12 @@
 package homework1;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
- * A node in the tree containing own board, calculated f score, number of moves to that board, it's parent and the path to the current
- * board. Implementing comparable, so it can be compared in the priority queue
+ * A node in the tree containing a board, the calculated heuristic for this board, the number of moves to this board and the fScore
  */
-public class Node implements Comparable<Node> {
+public class Node {
 	private Board board;
 
 	// Manhattan distance
@@ -53,8 +55,26 @@ public class Node implements Comparable<Node> {
 		this.fScore = fScore;
 	}
 
+	/**
+	 * Checks if two nodes are equal. We agree that two nodes are equal if they have the same board. It is this way, so we can check and
+	 * avoid expanding already expanded board when iterating the neighbours
+	 * 
+	 * @param o
+	 *            - the other node
+	 * @return true if the nodes are equal, false otherwise
+	 */
 	@Override
-	public int compareTo(Node other) {
-		return this.fScore - other.fScore;
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof Node))
+			return false;
+		Node node = (Node) o;
+		return Arrays.deepEquals(getBoard().getTiles(), node.getBoard().getTiles());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash((Object) getBoard().getTiles());
 	}
 }

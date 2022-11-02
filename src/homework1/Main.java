@@ -18,15 +18,17 @@ public class Main {
 		// Initial f score
 		int threshold = root.getfScore();
 
-		List<Node> visited = new ArrayList<>();
-		visited.add(root);
+		// List of the nodes that form the current path from the root
+		List<Node> currentPath = new ArrayList<>();
+		currentPath.add(root);
+
+		// List with the steps leading to the solution
 		List<String> steps = new ArrayList<>();
 
 		int minThreshold;
 		do {
-			// System.out.println("Threshold: " + threshold);
 			// Returns the minimum threshold, bigger than the current or Integer.MAX_VALUE if no there is no solution
-			minThreshold = recursiveSearch(visited, 0, threshold, steps);
+			minThreshold = recursiveSearch(currentPath, 0, threshold, steps);
 
 			// If the goal is found
 			if (minThreshold == 0) {
@@ -42,8 +44,8 @@ public class Main {
 	/**
 	 * Explores all children that have fScore <= threshold
 	 * 
-	 * @param visited
-	 *            - list of visited nodes
+	 * @param currentPath
+	 *            - list of the nodes in the path from the root
 	 * @param cost
 	 *            - the cost to the current node
 	 * @param threshold
@@ -53,13 +55,13 @@ public class Main {
 	 * @return 0 if the solution is found, Integer.MAX_VALUE if there is no solution, the smallest fScore which is higher than the current
 	 *         threshold
 	 */
-	private static int recursiveSearch(List<Node> visited, int cost, double threshold, List<String> steps) {
-		Node current = visited.get(visited.size() - 1);
+	private static int recursiveSearch(List<Node> currentPath, int cost, double threshold, List<String> steps) {
+		Node current = currentPath.get(currentPath.size() - 1);
 		current.sethScore(current.getBoard().manhattanDistance());
 		current.setgScore(cost);
 		current.setfScore(current.gethScore() + cost);
 
-		// If the current node has fScore larger than the given threshold, return
+		// If the current node has fScore larger than the given threshold, don't expand
 		if (current.getfScore() > threshold) {
 			return current.getfScore();
 		}
@@ -79,13 +81,13 @@ public class Main {
 			// gScore for every new node is current gScore + 1 as it costs one move to get to the new board
 			Node node = new Node(entry.getKey(), current.getgScore() + 1);
 
-			// Optimization - skip visited nodes
-			if (!visited.contains(node)) {
-				visited.add(node);
+			// Don't expand nodes on the current path - avoid loops (e.g. A -> B -> A)
+			if (!currentPath.contains(node)) {
+				currentPath.add(node);
 				steps.add(entry.getValue());
 
 				// Call recursively until goal is reached or all children with fScore > threshold are visited
-				int minFscoreOverThreshold = recursiveSearch(visited, node.getgScore(), threshold, steps);
+				int minFscoreOverThreshold = recursiveSearch(currentPath, node.getgScore(), threshold, steps);
 
 				// If solution is found exit recursion
 				if (minFscoreOverThreshold == 0) {
@@ -97,8 +99,8 @@ public class Main {
 					minNewFscore = minFscoreOverThreshold;
 				}
 
-				// Remove the current node as it is visited
-				visited.remove(visited.size() - 1);
+				// Remove the current node from the path as it is not part of the solution
+				currentPath.remove(currentPath.size() - 1);
 				steps.remove(steps.size() - 1);
 			}
 		}
@@ -183,10 +185,6 @@ public class Main {
 		}
 
 		Board board = new Board(rowSize, startingTiles);
-
-		System.out.println(board);
-
-		System.out.println("Solving...");
 
 		// Solving...
 		long startTime = System.currentTimeMillis();
