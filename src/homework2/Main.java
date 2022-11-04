@@ -11,6 +11,11 @@ public class Main {
 	private static int n;
 
 	private static void initializeBoard() {
+		chessboard = new int[n];
+		rows = new int[n];
+		mainDiagonal = new int[2 * n - 1];
+		secondaryDiagonal = new int[2 * n - 1];
+
 		for (int col = 0; col < n; col++) {
 			int row = getRandomNumberBetween(0, n - 1);
 			// Setting the row of the queen for this column
@@ -25,12 +30,20 @@ public class Main {
 	}
 
 	private static int solve() {
-		int k = 10000;
+		int k = 100;
 		int col = -1, row = -1;
 		Random rand = new Random();
 		List<Integer> columnsList, rowsList;
 
+		// Try to find solution in k*n steps
 		for (int i = 0; i < k * n; i++) {
+			// Last iteration - restart
+			if (i == k * n - 1) {
+				System.out.println(i);
+				initializeBoard();
+				i = 0;
+			}
+
 			// Get column with max conflicts
 			columnsList = getColumnWithMaxConflicts();
 			col = columnsList.get(rand.nextInt(columnsList.size()));
@@ -168,11 +181,6 @@ public class Main {
 			System.out.println("No solution for this n");
 			return;
 		}
-
-		chessboard = new int[n];
-		rows = new int[n];
-		mainDiagonal = new int[2 * n - 1];
-		secondaryDiagonal = new int[2 * n - 1];
 
 		long startTime = System.currentTimeMillis();
 
