@@ -10,6 +10,7 @@ public class Main {
 	private static int[] rows, mainDiagonal, secondaryDiagonal;
 	private static int n;
 	private static boolean hasConflicts = true;
+	private static int steps = 0;
 
 	private static void initializeBoard() {
 		chessboard = new int[n];
@@ -35,8 +36,8 @@ public class Main {
 		}
 	}
 
-	private static int solve() {
-		int k = 3;
+	private static void solve() {
+		int k = 1;
 		int iter = 0;
 		int col, row;
 
@@ -45,7 +46,7 @@ public class Main {
 			// Get column with max conflicts
 			col = getColumnWithMaxConflicts();
 			if (!hasConflicts) {
-				return iter;
+				return;
 			}
 
 			// Get row with min conflicts
@@ -54,11 +55,12 @@ public class Main {
 			// Move the queen
 			int oldRow = chessboard[col];
 			moveQueen(col, oldRow, row);
+
+			steps++;
 		}
 		if (hasConflicts) {
 			solve();
 		}
-		return 0;
 	}
 
 	private static int getColumnWithMaxConflicts() {
@@ -177,20 +179,16 @@ public class Main {
 			printChessboard();
 		}
 
-		int steps = solve();
+		solve();
 
 		long endTime = System.currentTimeMillis();
 
-		System.out.println("Solved in " + --steps + " steps.");
+		System.out.println("Solved in " + steps + " steps.");
 
 		if (n < 100) {
 			System.out.println();
 			printChessboard();
 		}
-
-		// System.out.println("Rows: " + Arrays.toString(rows));
-		// System.out.println("Main diagonal: " + Arrays.toString(mainDiagonal));
-		// System.out.println("Secondary diagonal: " + Arrays.toString(secondaryDiagonal));
 
 		System.out.println((endTime - startTime) / 1000.0);
 	}
