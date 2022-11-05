@@ -9,15 +9,16 @@ public class Main {
 	private static int[] chessboard;
 	private static int[] rows, mainDiagonal, secondaryDiagonal;
 	private static int n;
+	private static boolean hasConflicts = true;
 
 	private static void initializeBoard() {
 		chessboard = new int[n];
 		rows = new int[n];
 		mainDiagonal = new int[2 * n - 1];
 		secondaryDiagonal = new int[2 * n - 1];
+		int row = 1;
 
 		for (int col = 0; col < n; col++) {
-			int row = getRandomNumberBetween(0, n - 1);
 			// Setting the row of the queen for this column
 			chessboard[col] = row;
 			// Incrementing the queens in the current row
@@ -26,51 +27,45 @@ public class Main {
 			mainDiagonal[col - row + n - 1]++;
 			// Incrementing the number of queens in the secondary diagonal ( column + row )
 			secondaryDiagonal[col + row]++;
+
+			row += 2;
+			if (row >= n) {
+				row = 0;
+			}
 		}
 	}
 
 	private static int solve() {
-		int k = 100;
-		int col = -1, row = -1;
-		Random rand = new Random();
-		List<Integer> columnsList, rowsList;
+		int k = 3;
+		int iter = 0;
+		int col, row;
 
 		// Try to find solution in k*n steps
-		for (int i = 0; i < k * n; i++) {
-			// Last iteration - restart
-			if (i == k * n - 1) {
-				System.out.println(i);
-				initializeBoard();
-				i = 0;
-			}
-
+		while (iter++ <= k * n) {
 			// Get column with max conflicts
-			columnsList = getColumnWithMaxConflicts();
-			col = columnsList.get(rand.nextInt(columnsList.size()));
-			if (col == -1) {
-				return i;
+			col = getColumnWithMaxConflicts();
+			if (!hasConflicts) {
+				return iter;
 			}
 
 			// Get row with min conflicts
-			rowsList = getRowWithMinConflicts(col);
-			row = rowsList.get(rand.nextInt(rowsList.size()));
-			if (row == -1) {
-				return i;
-			}
+			row = getRowWithMinConflicts(col);
 
 			// Move the queen
 			int oldRow = chessboard[col];
 			moveQueen(col, oldRow, row);
 		}
-
-		System.out.println("Failed");
+		if (hasConflicts) {
+			solve();
+		}
 		return 0;
 	}
 
-	private static List<Integer> getColumnWithMaxConflicts() {
+	private static int getColumnWithMaxConflicts() {
 		int conflicts = 0;
-		int maxConflicts = 0;
+		int maxConflicts = -1;
 		List<Integer> result = new ArrayList<>();
+		Random rand = new Random();
 
 		for (int col = 0; col < n; col++) {
 			int row = chessboard[col];
@@ -78,27 +73,29 @@ public class Main {
 
 			if (conflicts > maxConflicts) {
 				maxConflicts = conflicts;
+				result.clear();
 				result.add(col);
 			}
 
-			if (conflicts == maxConflicts && conflicts != 0) {
+			if (conflicts == maxConflicts) {
 				result.add(col);
 			}
 		}
 
-		// If no conflicts are found, signal for solution
-		if (result.isEmpty()) {
-			result.add(-1);
+		if (maxConflicts == 0) {
+			hasConflicts = false;
 		}
 
-		return result;
+		return result.get(rand.nextInt(result.size()));
 	}
 
-	private static List<Integer> getRowWithMinConflicts(int col) {
-		int conflicts = 0;
+	private static int getRowWithMinConflicts(int col) {
+		int conflicts;
 		int minConflicts = Integer.MAX_VALUE;
-		List<Integer> result = new ArrayList<>();
 		int oldRow = chessboard[col];
+
+		List<Integer> result = new ArrayList<>();
+		Random rand = new Random();
 
 		for (int row = 0; row < n; row++) {
 			// Move the queen to the new row
@@ -108,10 +105,9 @@ public class Main {
 
 			if (conflicts < minConflicts) {
 				minConflicts = conflicts;
+				result.clear();
 				result.add(row);
-			}
-
-			if (conflicts == minConflicts && conflicts != 0) {
+			} else if (conflicts == minConflicts) {
 				result.add(row);
 			}
 
@@ -119,12 +115,7 @@ public class Main {
 			moveQueen(col, row, oldRow);
 		}
 
-		// If no row is found, signal for solution
-		if (result.isEmpty()) {
-			result.add(-1);
-		}
-
-		return result;
+		return result.get(rand.nextInt(result.size()));
 	}
 
 	private static void moveQueen(int col, int oldRow, int newRow) {
@@ -168,11 +159,6 @@ public class Main {
 		}
 	}
 
-	private static int getRandomNumberBetween(int lowerBound, int upperBound) {
-		Random random = new Random();
-		return random.nextInt(upperBound - lowerBound + 1) + lowerBound;
-	}
-
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 
@@ -195,7 +181,7 @@ public class Main {
 
 		long endTime = System.currentTimeMillis();
 
-		System.out.println("Solved in " + steps + " steps.");
+		System.out.println("Solved in " + --steps + " steps.");
 
 		if (n < 100) {
 			System.out.println();
