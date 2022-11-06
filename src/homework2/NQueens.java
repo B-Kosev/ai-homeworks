@@ -5,13 +5,21 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Main {
+// Github: https://github.com/B-Kosev/ai-homeworks
+public class NQueens {
+	// Holds the index of the row with the queen for each column
 	private static int[] chessboard;
+	// Counts the number of queens in each row and diagonal
 	private static int[] rows, mainDiagonal, secondaryDiagonal;
+	// Size of the board
 	private static int n;
 	private static boolean hasConflicts = true;
+	// Counts the number of moves to solve the board
 	private static int steps = 0;
 
+	/**
+	 * A method, initializing the board for the given n. Places the queens respecting the 'horse pattern'.
+	 */
 	private static void initializeBoard() {
 		chessboard = new int[n];
 		rows = new int[n];
@@ -24,11 +32,12 @@ public class Main {
 			chessboard[col] = row;
 			// Incrementing the queens in the current row
 			rows[row]++;
-			// Incrementing the queens in the main diagonal ( column - row + n - 1 )
+			// Incrementing the queens in the main diagonal
 			mainDiagonal[col - row + n - 1]++;
-			// Incrementing the number of queens in the secondary diagonal ( column + row )
+			// Incrementing the number of queens in the secondary diagonal
 			secondaryDiagonal[col + row]++;
 
+			// Horse pattern
 			row += 2;
 			if (row >= n) {
 				row = 0;
@@ -36,6 +45,9 @@ public class Main {
 		}
 	}
 
+	/**
+	 * A method solving the NQueens problem.
+	 */
 	private static void solve() {
 		int k = 1;
 		int iter = 0;
@@ -63,12 +75,20 @@ public class Main {
 		}
 	}
 
+	/**
+	 * Calculates the number of conflicts for each column and returns the one with the most conflicts.
+	 * 
+	 * @return the column, where the queen has the most conflicts. If multiple columns with the same number of conflicts returns one of them
+	 *         randomly.
+	 */
 	private static int getColumnWithMaxConflicts() {
-		int conflicts = 0;
+		int conflicts;
 		int maxConflicts = -1;
+
 		List<Integer> result = new ArrayList<>();
 		Random rand = new Random();
 
+		// Iterate over all columns
 		for (int col = 0; col < n; col++) {
 			int row = chessboard[col];
 			conflicts = countConflicts(row, col);
@@ -77,9 +97,7 @@ public class Main {
 				maxConflicts = conflicts;
 				result.clear();
 				result.add(col);
-			}
-
-			if (conflicts == maxConflicts) {
+			} else if (conflicts == maxConflicts) {
 				result.add(col);
 			}
 		}
@@ -91,6 +109,12 @@ public class Main {
 		return result.get(rand.nextInt(result.size()));
 	}
 
+	/**
+	 * Calculates the row where the queen would have minimum conflicts for the given column.
+	 *
+	 * @return the row, where the queen has the least conflicts. If multiple rows with the same number of conflicts returns one of them
+	 *         randomly.
+	 */
 	private static int getRowWithMinConflicts(int col) {
 		int conflicts;
 		int minConflicts = Integer.MAX_VALUE;
@@ -99,6 +123,7 @@ public class Main {
 		List<Integer> result = new ArrayList<>();
 		Random rand = new Random();
 
+		// Iterate over all rows for the given column
 		for (int row = 0; row < n; row++) {
 			// Move the queen to the new row
 			moveQueen(col, oldRow, row);
@@ -120,25 +145,47 @@ public class Main {
 		return result.get(rand.nextInt(result.size()));
 	}
 
+	/**
+	 * Moves the queen for the given column to a new row
+	 * 
+	 * @param col
+	 *            - the given column
+	 * @param oldRow
+	 *            - the current row of the queen
+	 * @param newRow
+	 *            - the new row of the queen
+	 */
 	private static void moveQueen(int col, int oldRow, int newRow) {
 		chessboard[col] = newRow;
 
-		// Lower counts for the old row and diagonals
+		// Decrease the count for the old row and diagonals
 		rows[oldRow]--;
 		mainDiagonal[col - oldRow + n - 1]--;
 		secondaryDiagonal[col + oldRow]--;
 
-		// Bump counts for the new row and diagonals
+		// Increase the count for the new row and diagonals
 		rows[newRow]++;
 		mainDiagonal[col - newRow + n - 1]++;
 		secondaryDiagonal[col + newRow]++;
 	}
 
+	/**
+	 * Counts the conflicts for the given queen
+	 * 
+	 * @param row
+	 *            - the row of the queen
+	 * @param col
+	 *            - the column of the queen
+	 * @return the number of conflicts
+	 */
 	private static int countConflicts(int row, int col) {
 		int queensPerRow = rows[row];
 		int queensPerMainDiagonal = mainDiagonal[col - row + n - 1];
 		int queensPerSecondaryDiagonal = secondaryDiagonal[col + row];
 
+		// The formula is calculating the number of edges in a complete graph as every queen is connected to every other queen for the row
+		// or diagonal
+		// (N * (N-1)) / 2
 		int conflicts = (queensPerRow * (queensPerRow - 1)) / 2;
 		conflicts += (queensPerMainDiagonal * (queensPerMainDiagonal - 1)) / 2;
 		conflicts += (queensPerSecondaryDiagonal * (queensPerSecondaryDiagonal - 1)) / 2;
@@ -152,7 +199,7 @@ public class Main {
 			// Iterates columns
 			for (int j = 0; j < n; j++) {
 				if (chessboard[j] == i) {
-					System.out.print("W ");
+					System.out.print("* ");
 				} else {
 					System.out.print("_ ");
 				}
@@ -174,21 +221,16 @@ public class Main {
 
 		initializeBoard();
 
-		if (n < 100) {
-			System.out.println("Starting chessboard: ");
-			printChessboard();
-		}
-
 		solve();
 
 		long endTime = System.currentTimeMillis();
-
-		System.out.println("Solved in " + steps + " steps.");
 
 		if (n < 100) {
 			System.out.println();
 			printChessboard();
 		}
+
+		System.out.println("Solved in " + steps + " steps.");
 
 		System.out.println((endTime - startTime) / 1000.0);
 	}
