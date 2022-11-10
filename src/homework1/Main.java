@@ -169,11 +169,6 @@ public class Main {
 		int rowSize = (int) Math.sqrt(n + 1);
 		int[][] startingTiles = new int[rowSize][rowSize];
 
-		// Default position - lower left corner
-		if (zeroIndex == -1) {
-			zeroIndex = rowSize * (rowSize - 1);
-		}
-
 		// Populate the starting and goal board
 		for (int i = 0; i < rowSize; i++) {
 			for (int j = 0; j < rowSize; j++) {
@@ -185,6 +180,8 @@ public class Main {
 		}
 
 		Board board = new Board(rowSize, startingTiles);
+
+		System.out.println(board);
 
 		// Solving...
 		long startTime = System.currentTimeMillis();
