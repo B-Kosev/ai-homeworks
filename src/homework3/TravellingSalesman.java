@@ -4,6 +4,7 @@ import java.util.*;
 
 public class TravellingSalesman {
 	private static int n;
+	private static final int POPULATION_SIZE = 10;
 	private static final Random random = new Random();
 	private static List<City> cities;
 
@@ -16,6 +17,21 @@ public class TravellingSalesman {
 		for (int i = 0; i < n; i++) {
 			City city = new City(i, getRandomNumberBetween(0.0, 100.0), getRandomNumberBetween(0.0, 100.0));
 			cities.add(city);
+		}
+	}
+
+	private static void generateRandomPopulation() {
+		List<Integer> arrList = new ArrayList<>();
+		for (int i = 0; i < n; i++) {
+			arrList.add(i);
+		}
+
+		for (int i = 0; i < POPULATION_SIZE; i++) {
+			Chromosome c = new Chromosome(n);
+			Collections.shuffle(arrList);
+			c.setPath(arrList.stream().mapToInt(Integer::intValue).toArray());
+			c.calculateFitness(cities);
+			currentGeneration.add(c);
 		}
 	}
 
@@ -84,12 +100,13 @@ public class TravellingSalesman {
 		for (int i = slice; i < n; i++) {
 			isThere = true;
 			while (isThere) {
-				currentGene = parent.getPath()[k++];
+				currentGene = parent.getPath()[k];
 				isThere = false;
 
 				for (int j = 0; j < n; j++) {
 					if (child.getPath()[i] == currentGene) {
 						isThere = true;
+						k++;
 						break;
 					}
 				}
@@ -104,14 +121,22 @@ public class TravellingSalesman {
 	}
 
 	private static void solve() {
-		int iter = 0, generation = 20;
+		int iter = 1, generations = 20;
 		// Generate random population
+		generateRandomPopulation();
 
-		while (iter++ < generation) {
+		while (iter <= generations) {
+			if (iter == 1 || iter == 10 || iter == 20) {
+				Chromosome best = currentGeneration.peek();
+				System.out.printf("Best for generation %d with distance %f and path %s.\n", iter, best.getFitness(),
+						Arrays.toString(best.getPath()));
+			}
 
 			reproduce();
 
 			createNewGeneration();
+
+			iter++;
 		}
 	}
 
@@ -129,7 +154,5 @@ public class TravellingSalesman {
 		initializeCities(n);
 
 		solve();
-
-		// System.out.println(calculateDistance(cities.get(0).getX(), cities.get(0).getY(), cities.get(1).getX(), cities.get(1).getY()));
 	}
 }
