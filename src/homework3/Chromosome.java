@@ -1,17 +1,21 @@
 package homework3;
 
-public class Chromosome {
-	private final City[] path;
+import java.util.List;
+
+public class Chromosome implements Comparable<Chromosome> {
+	private int[] path;
 	private double fitness = -1;
 
-	public Chromosome(City[] path) {
-		this.path = new City[path.length];
-		System.arraycopy(path, 0, this.path, 0, path.length);
-		this.fitness = calculateFitness();
+	public Chromosome(int n) {
+		this.path = new int[n];
 	}
 
-	public City[] getPath() {
+	public int[] getPath() {
 		return path;
+	}
+
+	public void setPath(int[] path) {
+		this.path = path;
 	}
 
 	public double getFitness() {
@@ -22,19 +26,31 @@ public class Chromosome {
 		this.fitness = fitness;
 	}
 
-	private double calculateFitness() {
+	public void calculateFitness(List<City> cities) {
 		double distance = 0.0;
 		for (int i = 0; i < path.length; i++) {
+			// Calculate from the end to the beginning
 			if (i + 1 == path.length)
-				distance += calculateDistance(path[i].getX(), path[i].getY(), path[0].getX(), path[0].getY());
+				distance += calculateDistance(cities.get(path[i]).getX(), cities.get(path[i]).getY(), cities.get(path[0]).getX(),
+						cities.get(path[0]).getY());
 			else
-				distance += calculateDistance(path[i].getX(), path[i].getY(), path[i + 1].getX(), path[i + 1].getY());
+				distance += calculateDistance(cities.get(path[i]).getX(), cities.get(path[i]).getY(), cities.get(path[i + 1]).getX(),
+						cities.get(path[i + 1]).getY());
 		}
-		return distance;
+		setFitness(distance);
 	}
 
 	private double calculateDistance(double x1, double y1, double x2, double y2) {
 		return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 	}
 
+	@Override
+	public int compareTo(Chromosome o) {
+		if (this.getFitness() == o.getFitness())
+			return 0;
+		else if (this.getFitness() - o.getFitness() > 0)
+			return 1;
+		else
+			return -1;
+	}
 }
