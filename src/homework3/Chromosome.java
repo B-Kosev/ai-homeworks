@@ -8,6 +8,9 @@ public class Chromosome implements Comparable<Chromosome> {
 
 	public Chromosome(int n) {
 		this.path = new int[n];
+		for (int i = 0; i < n; i++) {
+			path[i] = -1;
+		}
 	}
 
 	public int[] getPath() {
@@ -28,6 +31,7 @@ public class Chromosome implements Comparable<Chromosome> {
 
 	public void calculateFitness(List<City> cities) {
 		double distance = 0.0;
+
 		for (int i = 0; i < path.length; i++) {
 			// Calculate from the end to the beginning
 			if (i + 1 == path.length)
@@ -46,11 +50,6 @@ public class Chromosome implements Comparable<Chromosome> {
 
 	@Override
 	public int compareTo(Chromosome o) {
-		if (this.getFitness() == o.getFitness())
-			return 0;
-		else if (this.getFitness() - o.getFitness() > 0)
-			return 1;
-		else
-			return -1;
+		return Double.compare(this.getFitness(), o.getFitness());
 	}
 }

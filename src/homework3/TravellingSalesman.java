@@ -4,12 +4,12 @@ import java.util.*;
 
 public class TravellingSalesman {
 	private static int n;
-	private static final int POPULATION_SIZE = 10;
+	private static final int POPULATION_SIZE = 100;
 	private static final Random random = new Random();
 	private static List<City> cities;
 
-	private static PriorityQueue<Chromosome> currentGeneration = new PriorityQueue<>(Collections.reverseOrder());
-	private static final PriorityQueue<Chromosome> nextGeneration = new PriorityQueue<>(Collections.reverseOrder());
+	private static final PriorityQueue<Chromosome> currentGeneration = new PriorityQueue<>();
+	private static final PriorityQueue<Chromosome> nextGeneration = new PriorityQueue<>();
 
 	private static void initializeCities(int n) {
 		cities = new ArrayList<>();
@@ -54,7 +54,7 @@ public class TravellingSalesman {
 		Chromosome child1 = new Chromosome(n);
 		Chromosome child2 = new Chromosome(n);
 
-		int slice = random.nextInt(cities.size());
+		int slice = random.nextInt(n);
 
 		// Copy from 0 to slice genes from the parent into the child
 		for (int i = 0; i < slice; i++) {
@@ -80,8 +80,8 @@ public class TravellingSalesman {
 	}
 
 	private static void mutate(Chromosome chromosome) {
-		int gene1 = random.nextInt(cities.size());
-		int gene2 = random.nextInt(cities.size());
+		int gene1 = random.nextInt(n);
+		int gene2 = random.nextInt(n);
 
 		int temp = chromosome.getPath()[gene1];
 		chromosome.getPath()[gene1] = chromosome.getPath()[gene2];
@@ -98,35 +98,39 @@ public class TravellingSalesman {
 
 		// Start from the first empty position in the genome
 		for (int i = slice; i < n; i++) {
-			isThere = true;
-			while (isThere) {
-				currentGene = parent.getPath()[k];
+			// Iterate parent genes
+			for (int j = 0; j < n; j++) {
+				currentGene = parent.getPath()[j];
 				isThere = false;
 
-				for (int j = 0; j < n; j++) {
-					if (child.getPath()[i] == currentGene) {
+				// Check if this gene is already present from the other parent
+				for (int l = 0; l < i; l++) {
+					if (currentGene == child.getPath()[l]) {
 						isThere = true;
-						k++;
 						break;
 					}
 				}
+				if (!isThere) {
+					child.getPath()[i] = currentGene;
+					break;
+				}
 			}
-			child.getPath()[i] = currentGene;
 		}
 	}
 
 	private static void createNewGeneration() {
-		currentGeneration = nextGeneration;
+		currentGeneration.clear();
+		currentGeneration.addAll(nextGeneration);
 		nextGeneration.clear();
 	}
 
 	private static void solve() {
-		int iter = 1, generations = 20;
+		int iter = 1, generations = 100;
 		// Generate random population
 		generateRandomPopulation();
 
 		while (iter <= generations) {
-			if (iter == 1 || iter == 10 || iter == 20) {
+			if (iter == 1 || iter % 10 == 0) {
 				Chromosome best = currentGeneration.peek();
 				System.out.printf("Best for generation %d with distance %f and path %s.\n", iter, best.getFitness(),
 						Arrays.toString(best.getPath()));
@@ -151,8 +155,14 @@ public class TravellingSalesman {
 		if (n > 100)
 			return;
 
+		long startTime = System.currentTimeMillis();
+
 		initializeCities(n);
 
 		solve();
+
+		long endTime = System.currentTimeMillis();
+
+		System.out.printf("Algorithm finished in %f seconds.", (endTime - startTime) / 1000.0);
 	}
 }
