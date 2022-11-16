@@ -1,14 +1,16 @@
-package homework3;
+package main.java.homework3;
 
 public class City {
 	private int id;
+	private String name;
 	private double x;
 	private double y;
 
-	public City(int id, double x, double y) {
+	public City(int id, double x, double y, String name) {
 		this.id = id;
 		this.x = x;
 		this.y = y;
+		this.name = name;
 	}
 
 	public int getId() {
@@ -35,8 +37,16 @@ public class City {
 		this.y = y;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	@Override
 	public String toString() {
-		return "ID: " + id + " (" + x + ", " + y + ")";
+		return "ID: " + id + " - " + name + " - " + "(" + x + ", " + y + ")";
 	}
 }

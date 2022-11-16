@@ -1,11 +1,11 @@
-package homework1;
+package main.java.homework1;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Board {
 	private final int rows;
-	private int[][] tiles;
+	private final int[][] tiles;
 
 	public Board(int rows, int[][] tiles) {
 		this.rows = rows;

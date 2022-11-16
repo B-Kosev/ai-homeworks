@@ -1,25 +1,51 @@
-package homework3;
+package main.java.homework3;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 public class TravellingSalesman {
 	private static int n;
-	private static final int POPULATION_SIZE = 100;
+	private static final int POPULATION_SIZE = 1500;
+	private static final int GENERATIONS = 100;
 	private static final Random random = new Random();
-	private static List<City> cities;
+	private static final List<City> cities = new ArrayList<>();
 
 	private static final PriorityQueue<Chromosome> currentGeneration = new PriorityQueue<>();
 	private static final PriorityQueue<Chromosome> nextGeneration = new PriorityQueue<>();
 
-	private static void initializeCities(int n) {
-		cities = new ArrayList<>();
-
-		for (int i = 0; i < n; i++) {
-			City city = new City(i, getRandomNumberBetween(0.0, 100.0), getRandomNumberBetween(0.0, 100.0));
+	/**
+	 * Creates the cities objects from the csv entries
+	 * 
+	 * @param testCities
+	 *            - the csv entries
+	 */
+	private static void initializeCities(List<String[]> testCities) {
+		int i = 0;
+		for (String[] row : testCities) {
+			City city = new City(i++, Double.parseDouble(row[0]), Double.parseDouble(row[1]), row[2]);
 			cities.add(city);
 		}
 	}
 
+	/**
+	 * Creates the cities objects with random coordinates and no names
+	 * 
+	 * @param n
+	 *            - number of cities
+	 */
+	private static void initializeRandomCities(int n) {
+		for (int i = 0; i < n; i++) {
+			City city = new City(i, getRandomNumberBetween(0.0, 100.0), getRandomNumberBetween(0.0, 100.0), "");
+			cities.add(city);
+		}
+	}
+
+	/**
+	 * Generates the first population randomly
+	 */
 	private static void generateRandomPopulation() {
 		List<Integer> arrList = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
@@ -35,6 +61,9 @@ public class TravellingSalesman {
 		}
 	}
 
+	/**
+	 * The main reproducing method. Gets the best parents and crossovers them. Then adds the parents to the next generation.
+	 */
 	private static void reproduce() {
 		Chromosome parent1, parent2;
 		int size = currentGeneration.size();
@@ -50,6 +79,15 @@ public class TravellingSalesman {
 		}
 	}
 
+	/**
+	 * The main crossover function. Creates children from the parents using the One-Point Crossover algorithm. Then performs mutation and
+	 * adds the children to the new generation.
+	 * 
+	 * @param parent1
+	 *            - the first parent
+	 * @param parent2
+	 *            - the second parent
+	 */
 	private static void crossover(Chromosome parent1, Chromosome parent2) {
 		Chromosome child1 = new Chromosome(n);
 		Chromosome child2 = new Chromosome(n);
@@ -79,6 +117,12 @@ public class TravellingSalesman {
 		nextGeneration.add(child2);
 	}
 
+	/**
+	 * Randomly swaps two genes
+	 * 
+	 * @param chromosome
+	 *            - the individual
+	 */
 	private static void mutate(Chromosome chromosome) {
 		int gene1 = random.nextInt(n);
 		int gene2 = random.nextInt(n);
@@ -88,6 +132,16 @@ public class TravellingSalesman {
 		chromosome.getPath()[gene2] = temp;
 	}
 
+	/**
+	 * After getting the genes from the first parent, adds the missing genes from the second parent.
+	 * 
+	 * @param parent
+	 *            - the second parent
+	 * @param child
+	 *            - the child with the genes from the first parent
+	 * @param slice
+	 *            - the slicing index
+	 */
 	private static void addRemainingGenes(Chromosome parent, Chromosome child, int slice) {
 		// Iterator for the parent genes
 		int k = 0;
@@ -118,22 +172,36 @@ public class TravellingSalesman {
 		}
 	}
 
+	/**
+	 * Creates the new generation
+	 */
 	private static void createNewGeneration() {
 		currentGeneration.clear();
 		currentGeneration.addAll(nextGeneration);
 		nextGeneration.clear();
 	}
 
+	/**
+	 * The main driver method. Calls the function creating the first population and then iterates over generations.
+	 */
 	private static void solve() {
-		int iter = 1, generations = 100;
+		int iter = 1;
 		// Generate random population
 		generateRandomPopulation();
 
-		while (iter <= generations) {
+		while (iter <= GENERATIONS) {
+			// Printing
 			if (iter == 1 || iter % 10 == 0) {
 				Chromosome best = currentGeneration.peek();
-				System.out.printf("Best for generation %d with distance %f and path %s.\n", iter, best.getFitness(),
-						Arrays.toString(best.getPath()));
+				int[] path = best.getPath();
+				System.out.printf("Best for generation %d with distance %f and path %s.\n", iter, best.getFitness(), Arrays.toString(path));
+
+				if (iter == 100) {
+					for (int j : path) {
+						System.out.println(cities.get(j));
+					}
+				}
+
 			}
 
 			reproduce();
@@ -144,6 +212,15 @@ public class TravellingSalesman {
 		}
 	}
 
+	/**
+	 * Generates a random number
+	 * 
+	 * @param lowerBound
+	 *            - the lower bound
+	 * @param upperBound
+	 *            - the upper bound
+	 * @return the random number
+	 */
 	private static double getRandomNumberBetween(double lowerBound, double upperBound) {
 		return lowerBound + (upperBound - lowerBound) * random.nextDouble();
 	}
@@ -155,9 +232,34 @@ public class TravellingSalesman {
 		if (n > 100)
 			return;
 
-		long startTime = System.currentTimeMillis();
+		// Read from CSV
+		BufferedReader reader = null;
+		List<String[]> testCities = new ArrayList<>();
+		try {
+			File file = new File("D:\\SI - 4 KURS\\AI\\Homeworks\\AI-Homeworks\\src\\main\\resources\\uk12_xy_names.csv");
+			reader = new BufferedReader(new FileReader(file));
+			String line = "";
 
-		initializeCities(n);
+			while ((line = reader.readLine()) != null) {
+				String[] row = line.split(",");
+				testCities.add(row);
+			}
+		} catch (Exception e) {
+			System.out.println("Exception: " + e);
+		} finally {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				System.out.println("Exception: " + e);
+			}
+		}
+
+		initializeCities(testCities);
+		// System.out.println(cities);
+
+		// initializeRandomCities(n);
+
+		long startTime = System.currentTimeMillis();
 
 		solve();
 
