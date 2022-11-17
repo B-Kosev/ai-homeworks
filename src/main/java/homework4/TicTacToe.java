@@ -54,8 +54,8 @@ public class TicTacToe {
 	}
 
 	public static int maximizer() {
-		if (board.isTerminal())
-			return board.evaluateBoard();
+		if (board.isTerminal(PLAYER_SYMBOL, PC_SYMBOL))
+			return board.evaluateBoard(PLAYER_SYMBOL, PC_SYMBOL);
 
 		int best = Integer.MIN_VALUE, v;
 
@@ -80,8 +80,8 @@ public class TicTacToe {
 	}
 
 	public static int minimizer() {
-		if (board.isTerminal())
-			return board.evaluateBoard();
+		if (board.isTerminal(PLAYER_SYMBOL, PC_SYMBOL))
+			return board.evaluateBoard(PLAYER_SYMBOL, PC_SYMBOL);
 
 		int best = Integer.MAX_VALUE, v;
 
@@ -130,7 +130,7 @@ public class TicTacToe {
 		board.printBoard();
 
 		// In all cases Player is MAX and PC is MIN
-		while (!board.isTerminal()) {
+		while (!board.isTerminal(PLAYER_SYMBOL, PC_SYMBOL)) {
 			if (playerTurn) {
 				int x, y;
 				do {
@@ -142,14 +142,13 @@ public class TicTacToe {
 				continue;
 			}
 
-			// Pass a variable who is maximizing a.k.a who is first because X must always be maximizing
 			Map.Entry<Integer, Integer> move = calculateMoveForPc();
 			makeMove(move.getKey(), move.getValue(), PC_SYMBOL);
 			playerTurn = !playerTurn;
 		}
 
-		if (board.isTerminal()) {
-			int eval = board.evaluateBoard();
+		if (board.isTerminal(PLAYER_SYMBOL, PC_SYMBOL)) {
+			int eval = board.evaluateBoard(PLAYER_SYMBOL, PC_SYMBOL);
 
 			if (eval == 0)
 				System.out.println("Tie.");

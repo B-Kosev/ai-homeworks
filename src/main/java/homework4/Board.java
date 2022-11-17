@@ -23,13 +23,13 @@ public class Board {
 		}
 	}
 
-	public int evaluateBoard() {
+	public int evaluateBoard(char maximizer, char minimizer) {
 		// Check for rows
 		for (int i = 0; i < 3; i++) {
 			if (tiles[i][0] == tiles[i][1] && tiles[i][1] == tiles[i][2]) {
-				if (tiles[i][0] == 'X') {
+				if (tiles[i][0] == maximizer) {
 					return countEmptyCells() + 1;
-				} else if (tiles[i][0] == 'O') {
+				} else if (tiles[i][0] == minimizer) {
 					return -1 * (countEmptyCells() + 1);
 				}
 			}
@@ -38,9 +38,9 @@ public class Board {
 		// Check for cols
 		for (int i = 0; i < 3; i++) {
 			if (tiles[0][i] == tiles[1][i] && tiles[1][i] == tiles[2][i]) {
-				if (tiles[0][i] == 'X') {
+				if (tiles[0][i] == maximizer) {
 					return countEmptyCells() + 1;
-				} else if (tiles[0][i] == 'O') {
+				} else if (tiles[0][i] == minimizer) {
 					return -1 * (countEmptyCells() + 1);
 				}
 			}
@@ -48,17 +48,17 @@ public class Board {
 
 		// Check diagonals
 		if (tiles[0][0] == tiles[1][1] && tiles[1][1] == tiles[2][2]) {
-			if (tiles[0][0] == 'X') {
+			if (tiles[0][0] == maximizer) {
 				return countEmptyCells() + 1;
-			} else if (tiles[0][0] == 'O') {
+			} else if (tiles[0][0] == minimizer) {
 				return -1 * (countEmptyCells() + 1);
 			}
 		}
 
 		if (tiles[0][2] == tiles[1][1] && tiles[1][1] == tiles[2][0]) {
-			if (tiles[0][2] == 'X') {
+			if (tiles[0][2] == maximizer) {
 				return countEmptyCells() + 1;
-			} else if (tiles[0][2] == 'O') {
+			} else if (tiles[0][2] == minimizer) {
 				return -1 * (countEmptyCells() + 1);
 			}
 		}
@@ -78,7 +78,7 @@ public class Board {
 		return count;
 	}
 
-	public boolean isTerminal() {
-		return evaluateBoard() != 0 || countEmptyCells() == 0;
+	public boolean isTerminal(char maximizer, char minimizer) {
+		return evaluateBoard(maximizer, minimizer) != 0 || countEmptyCells() == 0;
 	}
 }
