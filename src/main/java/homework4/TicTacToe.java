@@ -36,7 +36,7 @@ public class TicTacToe {
 				if (board.getTiles()[i][j] == EMPTY) {
 					board.getTiles()[i][j] = PC_SYMBOL;
 
-					v = maximizer();
+					v = maximizer(Integer.MIN_VALUE, Integer.MAX_VALUE);
 
 					// Update
 					if (v < best) {
@@ -53,7 +53,7 @@ public class TicTacToe {
 		return new AbstractMap.SimpleEntry<>(x, y);
 	}
 
-	public static int maximizer() {
+	public static int maximizer(int alpha, int beta) {
 		if (board.isTerminal(PLAYER_SYMBOL, PC_SYMBOL))
 			return board.evaluateBoard(PLAYER_SYMBOL, PC_SYMBOL);
 
@@ -65,7 +65,7 @@ public class TicTacToe {
 					// Player always is MAX
 					board.getTiles()[i][j] = PLAYER_SYMBOL;
 
-					v = minimizer();
+					v = minimizer(alpha, beta);
 
 					if (v > best) {
 						best = v;
@@ -73,13 +73,17 @@ public class TicTacToe {
 
 					// Undo
 					board.getTiles()[i][j] = EMPTY;
+
+					if (best >= beta)
+						return best;
+					alpha = Math.max(alpha, best);
 				}
 			}
 		}
 		return best;
 	}
 
-	public static int minimizer() {
+	public static int minimizer(int alpha, int beta) {
 		if (board.isTerminal(PLAYER_SYMBOL, PC_SYMBOL))
 			return board.evaluateBoard(PLAYER_SYMBOL, PC_SYMBOL);
 
@@ -91,7 +95,7 @@ public class TicTacToe {
 					// PC always is MIN
 					board.getTiles()[i][j] = PC_SYMBOL;
 
-					v = maximizer();
+					v = maximizer(alpha, beta);
 
 					if (v < best) {
 						best = v;
@@ -99,6 +103,10 @@ public class TicTacToe {
 
 					// Undo
 					board.getTiles()[i][j] = EMPTY;
+
+					if (best <= alpha)
+						return best;
+					beta = Math.min(beta, best);
 				}
 			}
 		}
