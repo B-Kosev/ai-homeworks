@@ -2,11 +2,11 @@ package main.java.homework3;
 
 import java.util.List;
 
-public class Chromosome implements Comparable<Chromosome> {
+public class Individual implements Comparable<Individual> {
 	private int[] path;
 	private double fitness = -1;
 
-	public Chromosome(int n) {
+	public Individual(int n) {
 		this.path = new int[n];
 		for (int i = 0; i < n; i++) {
 			path[i] = -1;
@@ -59,7 +59,7 @@ public class Chromosome implements Comparable<Chromosome> {
 	}
 
 	@Override
-	public int compareTo(Chromosome o) {
+	public int compareTo(Individual o) {
 		return Double.compare(this.getFitness(), o.getFitness());
 	}
 }

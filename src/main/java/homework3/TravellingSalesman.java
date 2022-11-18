@@ -13,8 +13,8 @@ public class TravellingSalesman {
 	private static final Random random = new Random();
 	private static final List<City> cities = new ArrayList<>();
 
-	private static final PriorityQueue<Chromosome> currentGeneration = new PriorityQueue<>();
-	private static final PriorityQueue<Chromosome> nextGeneration = new PriorityQueue<>();
+	private static final PriorityQueue<Individual> currentGeneration = new PriorityQueue<>();
+	private static final PriorityQueue<Individual> nextGeneration = new PriorityQueue<>();
 
 	/**
 	 * Creates the cities objects from the csv entries
@@ -53,11 +53,11 @@ public class TravellingSalesman {
 		}
 
 		for (int i = 0; i < POPULATION_SIZE; i++) {
-			Chromosome c = new Chromosome(n);
+			Individual individual = new Individual(n);
 			Collections.shuffle(arrList);
-			c.setPath(arrList.stream().mapToInt(Integer::intValue).toArray());
-			c.calculateFitness(cities);
-			currentGeneration.add(c);
+			individual.setPath(arrList.stream().mapToInt(Integer::intValue).toArray());
+			individual.calculateFitness(cities);
+			currentGeneration.add(individual);
 		}
 	}
 
@@ -65,7 +65,7 @@ public class TravellingSalesman {
 	 * The main reproducing method. Gets the best parents and crossovers them. Then adds the parents to the next generation.
 	 */
 	private static void reproduce() {
-		Chromosome parent1, parent2;
+		Individual parent1, parent2;
 		int size = currentGeneration.size();
 
 		while (currentGeneration.size() > size / 2) {
@@ -88,9 +88,9 @@ public class TravellingSalesman {
 	 * @param parent2
 	 *            - the second parent
 	 */
-	private static void crossover(Chromosome parent1, Chromosome parent2) {
-		Chromosome child1 = new Chromosome(n);
-		Chromosome child2 = new Chromosome(n);
+	private static void crossover(Individual parent1, Individual parent2) {
+		Individual child1 = new Individual(n);
+		Individual child2 = new Individual(n);
 
 		int slice = random.nextInt(n);
 
@@ -120,16 +120,16 @@ public class TravellingSalesman {
 	/**
 	 * Randomly swaps two genes
 	 * 
-	 * @param chromosome
+	 * @param individual
 	 *            - the individual
 	 */
-	private static void mutate(Chromosome chromosome) {
+	private static void mutate(Individual individual) {
 		int gene1 = random.nextInt(n);
 		int gene2 = random.nextInt(n);
 
-		int temp = chromosome.getPath()[gene1];
-		chromosome.getPath()[gene1] = chromosome.getPath()[gene2];
-		chromosome.getPath()[gene2] = temp;
+		int temp = individual.getPath()[gene1];
+		individual.getPath()[gene1] = individual.getPath()[gene2];
+		individual.getPath()[gene2] = temp;
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class TravellingSalesman {
 	 * @param slice
 	 *            - the slicing index
 	 */
-	private static void addRemainingGenes(Chromosome parent, Chromosome child, int slice) {
+	private static void addRemainingGenes(Individual parent, Individual child, int slice) {
 		// Iterator for the parent genes
 		int k = 0;
 		// Is the current gene found in the children
@@ -192,7 +192,7 @@ public class TravellingSalesman {
 		while (iter <= GENERATIONS) {
 			// Printing
 			if (iter == 1 || iter % 10 == 0) {
-				Chromosome best = currentGeneration.peek();
+				Individual best = currentGeneration.peek();
 				int[] path = best.getPath();
 				System.out.printf("Best for generation %d with distance %f and path %s.\n", iter, best.getFitness(), Arrays.toString(path));
 
