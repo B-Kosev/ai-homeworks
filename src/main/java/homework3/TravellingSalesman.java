@@ -6,12 +6,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
+// Github: https://github.com/B-Kosev/ai-homeworks
+
 public class TravellingSalesman {
 	private static int n;
-	private static final int POPULATION_SIZE = 1500;
+	private static final int POPULATION_SIZE = 600;
 	private static final int GENERATIONS = 100;
 	private static final Random random = new Random();
 	private static final List<City> cities = new ArrayList<>();
+	// Analytics
+	private static int seqDraws = 0;
+	private static int randomDraws = 0;
 
 	private static final PriorityQueue<Individual> currentGeneration = new PriorityQueue<>();
 	private static final PriorityQueue<Individual> nextGeneration = new PriorityQueue<>();
@@ -68,9 +73,31 @@ public class TravellingSalesman {
 		Individual parent1, parent2;
 		int size = currentGeneration.size();
 
+		List<Individual> parents = new ArrayList<>();
+
 		while (currentGeneration.size() > size / 2) {
-			parent1 = currentGeneration.remove();
-			parent2 = currentGeneration.remove();
+			parents.add(currentGeneration.remove());
+		}
+
+		while (!parents.isEmpty()) {
+			if (parents.size() == 1) {
+				break;
+			}
+
+			// Draw parents sequentially with 75% probability, and draw randomly with 25% probability
+			if (getRandomNumberBetween(1, 101) <= 75) {
+				// Draw sequentially
+				parent1 = parents.remove(0);
+				parent2 = parents.remove(0);
+				seqDraws++;
+
+			} else {
+				// Draw randomly
+				parent1 = parents.remove(getRandomNumberBetween(0, parents.size() - 1));
+				parent2 = parents.remove(getRandomNumberBetween(0, parents.size() - 1));
+				randomDraws++;
+
+			}
 
 			crossover(parent1, parent2);
 
@@ -225,6 +252,19 @@ public class TravellingSalesman {
 		return lowerBound + (upperBound - lowerBound) * random.nextDouble();
 	}
 
+	/**
+	 * Generates a random number
+	 *
+	 * @param lowerBound
+	 *            - the lower bound
+	 * @param upperBound
+	 *            - the upper bound
+	 * @return the random number
+	 */
+	private static int getRandomNumberBetween(int lowerBound, int upperBound) {
+		return lowerBound + random.nextInt(upperBound - lowerBound + 1);
+	}
+
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 
@@ -265,6 +305,8 @@ public class TravellingSalesman {
 
 		long endTime = System.currentTimeMillis();
 
-		System.out.printf("Algorithm finished in %f seconds.", (endTime - startTime) / 1000.0);
+		System.out.printf("Algorithm finished in %f seconds.\n", (endTime - startTime) / 1000.0);
+
+		System.out.println(seqDraws + " sequential draws and " + randomDraws + " random draws.");
 	}
 }
