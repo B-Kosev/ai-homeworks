@@ -4,12 +4,25 @@ import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Scanner;
 
+// Github: https://github.com/B-Kosev/ai-homeworks
+
 public class TicTacToe {
 	public static char PC_SYMBOL;
 	public static char PLAYER_SYMBOL;
 	public static char EMPTY = ' ';
 	private static Board board;
 
+	/**
+	 * Marks the given tile with the given symbol
+	 * 
+	 * @param x
+	 *            - the row
+	 * @param y
+	 *            - the column
+	 * @param symbol
+	 *            - the symbol
+	 * @return true if the move is made, false otherwise
+	 */
 	public static boolean makeMove(int x, int y, char symbol) {
 		if (x >= 0 && x < 3 && y >= 0 && y < 3) {
 			if (board.getTiles()[x][y] == EMPTY) {
@@ -25,8 +38,12 @@ public class TicTacToe {
 		return false;
 	}
 
-	// PC is MIN
-	public static Map.Entry<Integer, Integer> calculateMoveForPc() {
+	/**
+	 * Calculates the most optimal move for the PC (AI player). The PC is always minimizer
+	 * 
+	 * @return pair of row and column
+	 */
+	public static Map.Entry<Integer, Integer> getMoveForPc() {
 		int best = Integer.MAX_VALUE;
 		int x = -1, y = -1, v;
 
@@ -53,6 +70,15 @@ public class TicTacToe {
 		return new AbstractMap.SimpleEntry<>(x, y);
 	}
 
+	/**
+	 * The method for calculating maximizer's moves. This is always the player
+	 * 
+	 * @param alpha
+	 *            - best value so far for the maximizer
+	 * @param beta
+	 *            - best value so far for the minimizer
+	 * @return the static evaluation at the bottom of the recursion
+	 */
 	public static int maximizer(int alpha, int beta) {
 		if (board.isTerminal(PLAYER_SYMBOL, PC_SYMBOL))
 			return board.evaluateBoard(PLAYER_SYMBOL, PC_SYMBOL);
@@ -83,6 +109,15 @@ public class TicTacToe {
 		return best;
 	}
 
+	/**
+	 * The method for calculating minimizer's moves. This is always the PC
+	 *
+	 * @param alpha
+	 *            - best value so far for the maximizer
+	 * @param beta
+	 *            - best value so far for the minimizer
+	 * @return the static evaluation at the bottom of the recursion
+	 */
 	public static int minimizer(int alpha, int beta) {
 		if (board.isTerminal(PLAYER_SYMBOL, PC_SYMBOL))
 			return board.evaluateBoard(PLAYER_SYMBOL, PC_SYMBOL);
@@ -150,7 +185,7 @@ public class TicTacToe {
 				continue;
 			}
 
-			Map.Entry<Integer, Integer> move = calculateMoveForPc();
+			Map.Entry<Integer, Integer> move = getMoveForPc();
 			makeMove(move.getKey(), move.getValue(), PC_SYMBOL);
 			playerTurn = !playerTurn;
 		}

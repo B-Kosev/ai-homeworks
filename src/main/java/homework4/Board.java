@@ -23,6 +23,16 @@ public class Board {
 		}
 	}
 
+	/**
+	 * Function evaluating the board. It checks for any winning condition and if such is found, it adds 1 to the number of empty tiles left.
+	 * This way winning earlier in the game is always preferred.
+	 * 
+	 * @param maximizer
+	 *            - the symbol of the maximizer
+	 * @param minimizer
+	 *            - the symbol of the minimizer
+	 * @return a static evaluation of the board
+	 */
 	public int evaluateBoard(char maximizer, char minimizer) {
 		// Check for rows
 		for (int i = 0; i < 3; i++) {
@@ -67,6 +77,11 @@ public class Board {
 		return 0;
 	}
 
+	/**
+	 * Counts how many empty cells are left
+	 * 
+	 * @return the number of empty cells
+	 */
 	public int countEmptyCells() {
 		int count = 0;
 		for (int i = 0; i < 3; i++) {
@@ -78,6 +93,15 @@ public class Board {
 		return count;
 	}
 
+	/**
+	 * Checks whether a board is in terminal state
+	 * 
+	 * @param maximizer
+	 *            - the symbol of the maximizer
+	 * @param minimizer
+	 *            - the symbol of the minimizer
+	 * @return true or false
+	 */
 	public boolean isTerminal(char maximizer, char minimizer) {
 		return evaluateBoard(maximizer, minimizer) != 0 || countEmptyCells() == 0;
 	}
