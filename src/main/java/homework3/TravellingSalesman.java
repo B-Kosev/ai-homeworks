@@ -85,7 +85,7 @@ public class TravellingSalesman {
 			}
 
 			// Draw parents sequentially with 75% probability, and draw randomly with 25% probability
-			if (getRandomNumberBetween(1, 101) <= 75) {
+			if (getRandomNumberBetween(1, 101) <= 25) {
 				// Draw sequentially
 				parent1 = parents.remove(0);
 				parent2 = parents.remove(0);
