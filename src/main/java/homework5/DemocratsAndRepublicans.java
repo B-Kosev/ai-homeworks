@@ -12,13 +12,19 @@ public class DemocratsAndRepublicans {
 	private static final List<String[]> entries = new ArrayList<>();
 	private static final List<List<String[]>> dataSets = new ArrayList<>();
 
-	private static final int[][] republicans = new int[3][16];
-	private static final int[][] democrats = new int[3][16];
+	private static int[][] republicans;
+	private static int[][] democrats;
 
-	private static int repCounter = 0;
-	private static int demCounter = 0;
+	private static int repCounter;
+	private static int demCounter;
 
 	public static void transformData(List<String[]> dataSet) {
+		republicans = new int[3][16];
+		democrats = new int[3][16];
+
+		repCounter = 0;
+		demCounter = 0;
+
 		for (String[] row : dataSet) {
 			boolean isRepublican = row[0].equals("republican");
 			if (isRepublican) {
@@ -79,12 +85,12 @@ public class DemocratsAndRepublicans {
 				}
 				}
 			}
-			pRepublican += Math.log((repCounter + lambda) / (double) (repCounter + demCounter + 2 * lambda));
-			pDemocrat += Math.log((demCounter + lambda) / (double) (repCounter + demCounter + 2 * lambda));
+			pRepublican += Math.log((repCounter) / (double) (repCounter + demCounter));
+			pDemocrat += Math.log((demCounter) / (double) (repCounter + demCounter));
 
-			if (isRepublican && pRepublican >= pDemocrat)
+			if (isRepublican && pRepublican > pDemocrat)
 				correct++;
-			else if (!isRepublican && pDemocrat >= pRepublican)
+			else if (!isRepublican && pDemocrat > pRepublican)
 				correct++;
 		}
 
@@ -133,7 +139,7 @@ public class DemocratsAndRepublicans {
 				testSet.add(entries.remove(getRandomNumberBetween(0, entries.size() - 1)));
 			}
 			dataSets.add(testSet);
-			// countEntries(testSet);
+			countEntries(testSet);
 		}
 
 		// Training and testing
