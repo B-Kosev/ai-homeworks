@@ -18,7 +18,14 @@ public class DemocratsAndRepublicans {
 	private static int repCounter;
 	private static int demCounter;
 
+	/**
+	 * Fills the tables with the given dataset
+	 * 
+	 * @param dataSet
+	 *            - the dataset to be processed. One of the 10 folds
+	 */
 	public static void transformData(List<String[]> dataSet) {
+		// Refresh fields for each dataset
 		republicans = new int[3][16];
 		democrats = new int[3][16];
 
@@ -61,6 +68,13 @@ public class DemocratsAndRepublicans {
 		}
 	}
 
+	/**
+	 * Test the given dataset
+	 * 
+	 * @param testSet
+	 *            - the dataset to be tested. One of the 10 folds
+	 * @return the accuracy of the classifier
+	 */
 	private static double testSet(List<String[]> testSet) {
 		int lambda = 1;
 		int correct = 0;
@@ -99,6 +113,12 @@ public class DemocratsAndRepublicans {
 		return accuracy;
 	}
 
+	/**
+	 * Utility function to count the distribution of the data
+	 * 
+	 * @param testSet
+	 *            - the dataset to be counted
+	 */
 	private static void countEntries(List<String[]> testSet) {
 		long reps = testSet.stream().filter(row -> row[0].equals("republican")).count();
 		System.out.printf("Republicans: %d, Democrats: %d\n", reps, testSet.size() - reps);
