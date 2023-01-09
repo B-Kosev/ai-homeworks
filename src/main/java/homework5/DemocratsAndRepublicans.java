@@ -12,11 +12,11 @@ public class DemocratsAndRepublicans {
 	private static final List<String[]> entries = new ArrayList<>();
 	private static final List<List<String[]>> dataSets = new ArrayList<>();
 
-	private static int[][] republicans;
-	private static int[][] democrats;
+	private static int[][] republicans = new int[3][16];
+	private static int[][] democrats = new int[3][16];
 
-	private static int repCounter;
-	private static int demCounter;
+	private static int repCounter = 0;
+	private static int demCounter = 0;
 
 	/**
 	 * Fills the tables with the given dataset
@@ -26,11 +26,6 @@ public class DemocratsAndRepublicans {
 	 */
 	public static void transformData(List<String[]> dataSet) {
 		// Refresh fields for each dataset
-		republicans = new int[3][16];
-		democrats = new int[3][16];
-
-		repCounter = 0;
-		demCounter = 0;
 
 		for (String[] row : dataSet) {
 			boolean isRepublican = row[0].equals("republican");
@@ -178,6 +173,13 @@ public class DemocratsAndRepublicans {
 			overallAccuracy += testSet(dataSets.get(testIndex));
 
 			testIndex++;
+
+			// Refresh fields for the new iteration
+			republicans = new int[3][16];
+			democrats = new int[3][16];
+
+			repCounter = 0;
+			demCounter = 0;
 		}
 
 		System.out.printf("\nOverall accuracy: %f%%", overallAccuracy / 10);
